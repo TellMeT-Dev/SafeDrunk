@@ -2,16 +2,18 @@ package com.example.safedrunk
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import com.example.safedrunk.ui.theme.SafeDrunkTheme
+import com.example.safedrunk.view.ActiveLockScreen
+import com.example.safedrunk.view.LockScreen
+import com.example.safedrunk.view.UnlockScreen
+enum class Screen { LOCK, Active_L, Unlock }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +21,26 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SafeDrunkTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                var screen by rememberSaveable { mutableStateOf(Screen.LOCK) }
+
+                when (screen) {
+                    Screen.LOCK -> LockScreen(
+                        onActivateClick = { screen = Screen.Active_L }
                     )
+
+                    Screen.Active_L -> {
+                        BackHandler(enabled = true) { }   // "atrás" no hace nada
+                        ActiveLockScreen(
+                            onActivateClick = { screen = Screen.Unlock }
+                        )
+                    }
+
+                    Screen.Unlock -> {
+                        BackHandler(enabled = true) { screen = Screen.Active_L }
+                        UnlockScreen()
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SafeDrunkTheme {
-        Greeting("Android")
     }
 }

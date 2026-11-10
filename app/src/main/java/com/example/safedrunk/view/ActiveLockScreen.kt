@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.safedrunk.ui.theme.SafeDrunkTheme
+import androidx.compose.foundation.clickable
 
 private val restrictedApps = listOf(
     "Instagram", "TikTok", "Twitter", "YouTube",
@@ -33,7 +34,8 @@ private val restrictedApps = listOf(
 )
 
 @Composable
-fun ActiveLockScreen(modifier: Modifier = Modifier) {
+fun ActiveLockScreen(onActivateClick: () -> Unit = {},
+                     modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -125,7 +127,8 @@ fun ActiveLockScreen(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .height(54.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFF00AEFF)),
+                    .background(Color(0xFF00AEFF))
+                    .clickable(onClick = onActivateClick),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
