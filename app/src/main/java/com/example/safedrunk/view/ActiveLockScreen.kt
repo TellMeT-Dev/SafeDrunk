@@ -34,7 +34,9 @@ private val restrictedApps = listOf(
 )
 
 @Composable
-fun ActiveLockScreen(onActivateClick: () -> Unit = {},
+fun ActiveLockScreen(
+    remainingText: String = "29:58",
+    onActivateClick: () -> Unit = {},
                      modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
@@ -69,7 +71,7 @@ fun ActiveLockScreen(onActivateClick: () -> Unit = {},
 
             Spacer(Modifier.height(34.dp))
             Text(
-                text = "29:58",
+                text = remainingText,
                 modifier = Modifier.fillMaxWidth(),
                 color = Color.White,
                 fontSize = 52.sp,
