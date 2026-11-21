@@ -5,14 +5,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.safedrunk.ui.theme.SafeDrunkTheme
 import com.example.safedrunk.view.ActiveLockScreen
 import com.example.safedrunk.view.LockScreen
 import com.example.safedrunk.view.UnlockScreen
+import com.example.safedrunk.viewmodel.LockViewModel
 enum class Screen { LOCK, Active_L, Unlock }
 
 class MainActivity : ComponentActivity() {
@@ -21,8 +25,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SafeDrunkTheme {
+                val lockViewModel: LockViewModel = viewModel()
+                val uiState by lockViewModel.uiState.collectAsStateWithLifecycle()
                 var screen by rememberSaveable { mutableStateOf(Screen.LOCK) }
 
+                LaunchedEffect(uiState.isLockActive) {
+                    if (uiState.isLockActive && screen == Screen.LOCK) {
+                        screen = Screen.Active_L
+                    } else if (!uiState.isLockActive && screen != Screen.LOCK) {
+                        screen = Screen.LOCK
+                    }
+                }
                 when (screen) {
                     Screen.LOCK -> LockScreen(
                         onActivateClick = { screen = Screen.Active_L }
