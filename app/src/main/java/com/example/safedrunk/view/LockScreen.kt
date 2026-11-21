@@ -27,9 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.safedrunk.ui.theme.SafeDrunkTheme
 import androidx.compose.foundation.clickable
+import com.example.safedrunk.model.LockDuration
 
 @Composable
-fun LockScreen(onActivateClick: () -> Unit = {},
+fun LockScreen(selectDuration: LockDuration = LockDuration.H_1,
+               onDurationSelect: (lockDuration: LockDuration) -> Unit = {},
+               onActivateClick: () -> Unit = {},
                modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
@@ -69,18 +72,19 @@ fun LockScreen(onActivateClick: () -> Unit = {},
             Spacer(Modifier.height(12.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("30m", "1h", "2h", "2.5h").forEach { option ->
-                    val selected = option == "1h"
+                LockDuration.entries.forEach { option ->
+                    val selected = option == selectDuration
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .height(46.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(if (selected) Color(0xFF00AEFF) else Color.White.copy(alpha = 0.08f)),
+                            .background(if (selected) Color(0xFF00AEFF) else Color.White.copy(alpha = 0.08f))
+                            .clickable{onDurationSelect(option)},
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = option,
+                            text = option.label,
                             color = if (selected) Color.White else Color.White.copy(alpha = 0.7f),
                             fontSize = 14.sp,
                             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
