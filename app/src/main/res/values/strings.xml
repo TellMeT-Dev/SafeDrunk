@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SafeDrunk</string>
+    <string name="accessibility_service_description">SafeDrunk usa este servicio solo para detectar qué aplicación está abierta y bloquearla mientras el bloqueo esté activo. No lee ni guarda el contenido de tus pantallas.</string>
 </resources>
