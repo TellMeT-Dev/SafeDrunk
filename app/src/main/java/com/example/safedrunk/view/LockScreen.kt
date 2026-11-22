@@ -19,21 +19,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.safedrunk.model.LockDuration
 import com.example.safedrunk.ui.theme.SafeDrunkTheme
 import androidx.compose.foundation.clickable
-import com.example.safedrunk.model.LockDuration
 
 @Composable
-fun LockScreen(selectDuration: LockDuration = LockDuration.H_1,
-               onDurationSelect: (lockDuration: LockDuration) -> Unit = {},
-               onActivateClick: () -> Unit = {},
-               modifier: Modifier = Modifier) {
+fun LockScreen(
+    selectedDuration: LockDuration = LockDuration.H_1,
+    onDurationSelected: (LockDuration) -> Unit = {},
+    isBlockerEnabled: Boolean = true,
+    onOpenAccessibilitySettings: () -> Unit = {},
+    onActivateClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -73,14 +78,14 @@ fun LockScreen(selectDuration: LockDuration = LockDuration.H_1,
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 LockDuration.entries.forEach { option ->
-                    val selected = option == selectDuration
+                    val selected = option == selectedDuration
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .height(46.dp)
                             .clip(RoundedCornerShape(14.dp))
                             .background(if (selected) Color(0xFF00AEFF) else Color.White.copy(alpha = 0.08f))
-                            .clickable{onDurationSelect(option)},
+                            .clickable { onDurationSelected(option) },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -148,13 +153,46 @@ fun LockScreen(selectDuration: LockDuration = LockDuration.H_1,
             )
 
             Spacer(Modifier.height(28.dp))
+            if (!isBlockerEnabled) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFFFF9800).copy(alpha = 0.12f))
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Falta un permiso",
+                        color = Color(0xFFFF9800),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "Para bloquear otras aplicaciones, activa el servicio de accesibilidad de SafeDrunk en Ajustes.",
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = "Abrir ajustes de accesibilidad",
+                        color = Color(0xFF00AEFF),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clickable(onClick = onOpenAccessibilitySettings)
+                    )
+                }
+                Spacer(Modifier.height(14.dp))
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
+                    .alpha(if (isBlockerEnabled) 1f else 0.4f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color(0xFF00AEFF))
-                    .clickable(onClick = onActivateClick),
+                    .clickable(enabled = isBlockerEnabled, onClick = onActivateClick),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
