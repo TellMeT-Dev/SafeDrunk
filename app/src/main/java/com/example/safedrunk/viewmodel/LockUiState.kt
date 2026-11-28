@@ -2,7 +2,6 @@ package com.example.safedrunk.viewmodel
 
 import com.example.safedrunk.model.LockDuration
 
-/** Todo lo que las pantallas de bloqueo necesitan para dibujarse. */
 data class LockUiState(
     val selectedDuration: LockDuration = LockDuration.H_1,
     val isLockActive: Boolean = false,
