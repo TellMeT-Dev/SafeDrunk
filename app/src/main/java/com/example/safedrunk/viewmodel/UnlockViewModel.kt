@@ -42,4 +42,8 @@ class UnlockViewModel: ViewModel(){
             ) }
         }
     }
+
+    fun reset(){
+        _uiState.value = UnlockUiState(challenge = ChallengeGenerator.generate())
+    }
 }

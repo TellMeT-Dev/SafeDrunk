@@ -22,6 +22,7 @@ import com.example.safedrunk.view.ActiveLockScreen
 import com.example.safedrunk.view.LockScreen
 import com.example.safedrunk.view.UnlockScreen
 import com.example.safedrunk.viewmodel.LockViewModel
+import com.example.safedrunk.viewmodel.UnlockViewModel
 
 enum class Screen { LOCK, Active_L, Unlock }
 
@@ -33,11 +34,20 @@ class MainActivity : ComponentActivity() {
             SafeDrunkTheme {
                 val context = LocalContext.current
                 val lockViewModel: LockViewModel = viewModel()
+                val unlockViewModel: UnlockViewModel = viewModel()
                 val uiState by lockViewModel.uiState.collectAsStateWithLifecycle()
+                val unlockState by unlockViewModel.uiState.collectAsStateWithLifecycle()
                 var screen by rememberSaveable { mutableStateOf(Screen.LOCK) }
 
                 LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
                     lockViewModel.refreshBlockerStatus()
+                }
+
+                LaunchedEffect(unlockState.isSolved) {
+                    if (unlockState.isSolved) {
+                        lockViewModel.finishLock()
+                        unlockViewModel.reset()
+                    }
                 }
 
 
@@ -70,7 +80,14 @@ class MainActivity : ComponentActivity() {
 
                     Screen.Unlock -> {
                         BackHandler(enabled = true) { screen = Screen.Active_L }
-                        UnlockScreen()
+                        UnlockScreen(
+                            challengeText = unlockState.challenge.text,
+                            input = unlockState.input,
+                            hasError = unlockState.hasError,
+                            onDigitClick = unlockViewModel::onDigit,
+                            onDeleteClick = unlockViewModel::onDelete,
+                            onConfirmClick = unlockViewModel::onConfirm
+                        )
                     }
                 }
             }
