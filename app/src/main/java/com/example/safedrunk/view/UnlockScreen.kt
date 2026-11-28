@@ -2,6 +2,7 @@ package com.example.safedrunk.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.safedrunk.model.MathChallenge
 import com.example.safedrunk.ui.theme.SafeDrunkTheme
 
 private val keypadRows = listOf(
@@ -37,7 +39,14 @@ private val keypadRows = listOf(
 )
 
 @Composable
-fun UnlockScreen(modifier: Modifier = Modifier) {
+fun UnlockScreen(challengeText: String = "50 + 16",
+    input: String = "",
+    hasError: Boolean = false,
+    onDigitClick: (Int) -> Unit = {},
+    onDeleteClick: () -> Unit = {},
+    onConfirmClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -70,7 +79,7 @@ fun UnlockScreen(modifier: Modifier = Modifier) {
 
             Spacer(Modifier.height(30.dp))
             Text(
-                text = "50 + 16",
+                text = challengeText,
                 color = Color.White,
                 fontSize = 44.sp,
                 fontWeight = FontWeight.Bold
@@ -78,7 +87,7 @@ fun UnlockScreen(modifier: Modifier = Modifier) {
 
             Spacer(Modifier.height(18.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                repeat(3) {
+                repeat(MathChallenge.MAX_ANSWER_DIGITS) { index ->
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -89,12 +98,22 @@ fun UnlockScreen(modifier: Modifier = Modifier) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "—",
-                            color = Color.White.copy(alpha = 0.35f),
+                            text = input.getOrNull(index)?.toString() ?: "—",
+                            color = if (index < input.length) Color.White else Color.White.copy(alpha = 0.35f),
                             fontSize = 22.sp
                         )
                     }
                 }
+            }
+
+            if (hasError) {
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = "Respuesta incorrecta. Resuelve la nueva operación.",
+                    color = Color(0xFFFF5B5B),
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                )
             }
 
             Spacer(Modifier.height(30.dp))
@@ -126,7 +145,14 @@ fun UnlockScreen(modifier: Modifier = Modifier) {
                                         key == "DEL" -> Color(0xFFFF5B5B).copy(alpha = 0.12f)
                                         else -> Color.White.copy(alpha = 0.08f)
                                     }
-                                ),
+                                )
+                                .clickable {
+                                    when (key) {
+                                        "DEL" -> onDeleteClick()
+                                        "OK" -> onConfirmClick()
+                                        else -> onDigitClick(key.toInt())
+                                    }
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
